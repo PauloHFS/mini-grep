@@ -1,10 +1,6 @@
-use std::{
-    env,
-    fs::File,
-    io::{BufRead, BufReader},
-};
+use std::env;
 
-use mini_grep::Config;
+use mini_grep::{Config, grep};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -22,22 +18,6 @@ fn main() {
         }
     };
 
-    let file_result = File::open(config.file_path);
-
-    let file = match file_result {
-        Ok(file) => file,
-        Err(err) => {
-            eprintln!("Error na configuração: {err}");
-            std::process::exit(1);
-        }
-    };
-
-    let reader = BufReader::new(file);
-
-    reader
-        .lines()
-        .map_while(Result::ok)
-        .map(|line| line.to_lowercase())
-        .filter(|line| line.contains(config.query))
-        .for_each(|line| println!("{line}"));
+    let stdout = std::io::stdout();
+    grep(&config, stdout);
 }
